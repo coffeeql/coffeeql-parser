@@ -7,4 +7,5 @@ license     = "Apache-2.0"
 repository  = "https://github.com/coffeeql/coffeeql-parser"
 
 [dependencies]
-thiserror = "2.0.18"
+thiserror      = "2.0.18"
+coffeeql-lexer = { git = "https://github.com/coffeeql/coffeeql-lexer" }
