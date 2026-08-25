@@ -1,0 +1,10 @@
+[package]
+name        = "coffeeql-parser"
+version     = "0.1.0"
+edition     = "2021"
+description = "The parser for CoffeeQL — converts a token stream into a typed AST"
+license     = "Apache-2.0"
+repository  = "https://github.com/coffeeql/coffeeql-parser"
+
+[dependencies]
+thiserror = "2.0.18"
