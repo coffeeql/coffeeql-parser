@@ -1,7 +1,7 @@
 //! Pratt Parser — Expression parsing with precedence climbing
 //! Used inside .where() conditions
 
-use crate::lexer::Token;
+use coffeeql_lexer::Token;
 use super::ast::{Expression, BinaryOp};
 use super::error::ParseError;
 
