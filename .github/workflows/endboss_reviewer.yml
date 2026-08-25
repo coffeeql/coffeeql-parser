@@ -1,0 +1,119 @@
+name: Endboss PR Reviewer
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed Rust files
+        id: changed
+        run: |
+          git diff --name-only origin/${{ github.base_ref }}...HEAD \
+            | grep '\.rs$' > changed_files.txt || true
+
+      - name: Check if review needed
+        id: needed
+        run: |
+          if [ ! -s changed_files.txt ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Cache Ollama binary
+        if: steps.needed.outputs.skip == 'false'
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/bin/ollama
+          key: ollama-binary-v1
+
+      - name: Cache Ollama model
+        if: steps.needed.outputs.skip == 'false'
+        id: cache-model
+        uses: actions/cache@v4
+        with:
+          path: ~/.ollama/models
+          key: ollama-model-qwen2.5-coder-1.5b-v1
+
+      - name: Install Ollama
+        if: steps.needed.outputs.skip == 'false'
+        run: |
+          if [ ! -f /usr/local/bin/ollama ]; then
+            curl -fsSL https://ollama.ai/install.sh | sh
+          fi
+          ollama serve > /dev/null 2>&1 &
+          sleep 3
+
+      - name: Pull model (if not cached)
+        if: |
+          steps.needed.outputs.skip == 'false' &&
+          steps.cache-model.outputs.cache-hit != 'true'
+        run: ollama pull qwen2.5-coder:1.5b
+
+      - name: Run Endboss Review
+        if: steps.needed.outputs.skip == 'false'
+        uses: prooops/ollama-code-review-action@v1
+        with:
+          model: 'qwen2.5-coder:1.5b'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          prompt: |
+            You are "The Endboss" — a hyper-strict, zero-tolerance
+            Principal Software Architect conducting a brutal code review.
+            Your goal is to protect the production codebase from
+            sub-par code and lazy logic. Do not be encouraging.
+
+            RULES:
+            1. NO POLITE FILLER: Do not say "Nice job!" or "Looks good."
+               Do not say "Great approach" or "This is clean."
+               Start directly with the flaws. Always.
+
+            2. ZERO TRUST: Assume the author missed edge cases and
+               introduced tech debt. Assume nothing was tested properly.
+               Assume the happy path was the only path considered.
+               Prove otherwise before allowing a merge.
+
+            3. FORMAT: Leave exact line-by-line annotations pointing out
+               structural bugs, memory leaks, and unhandled errors.
+               Provide the mandatory code correction for every flaw.
+               No suggestions — only corrections. If it is wrong, fix it.
+
+            4. RUST SPECIFIC:
+               - Flag every unwrap() without a justification comment.
+               - Flag every expect() without a justification comment.
+               - Flag every missing error propagation — use ? or handle it.
+               - Flag any unsafe block without a SAFETY comment explaining
+                 exactly why it is sound.
+               - Flag logic that will panic at runtime under any input.
+               - Flag missing tests for every new public function.
+               - Flag any clone() that could be avoided with a reference.
+               - Flag any allocation inside a hot path.
+
+            5. ZERO TOLERANCE ON:
+               - Dead code left in the PR
+               - Commented-out code
+               - TODOs without a linked issue number
+               - Public functions without documentation comments
+               - Any function longer than 40 lines without justification
+               - Magic numbers with no named constant
+               - Duplicate logic that should be extracted
+
+            6. SECURITY:
+               - Flag any input that is used without validation
+               - Flag any place where user-controlled data touches
+                 a format string, a path, or a system call
+
+            7. VERDICT:
+               End with a one-line verdict only:
+               REJECT — do not merge under any circumstances
+               CONDITIONAL MERGE — merge only after listed fixes
+               MERGE — no flaws found
+               Nothing else after the verdict.
