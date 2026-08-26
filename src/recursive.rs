@@ -665,25 +665,19 @@ mod tests {
 
     #[test]
     fn parse_wrong_chain_order_errors() {
-        // users[].cup(10).where(...) — cup before where should fail
+        // sort is NOT valid from Start — only valid AfterWhere or AfterGive
         let tokens = make_tokens(vec![
             Token::Collection { name: "users".into(), kind: CollectionKind::Structured },
             Token::Dot,
-            Token::Cup,
+            Token::Sort,
             Token::LParen,
-            Token::Int(10),
-            Token::RParen,
-            Token::Dot,
-            Token::Where,
-            Token::LParen,
-            Token::Identifier("age".into()),
-            Token::Gt,
-            Token::Int(18),
+            Token::Identifier("name".into()),
+            Token::Comma,
+            Token::Asc,
             Token::RParen,
         ]);
-        // cup is valid from Start — so this actually succeeds and stops after cup
-        // where is not reachable — chain ends after cup
-        let stmts = RecursiveParser::new(tokens).parse().unwrap();
-        assert_eq!(stmts.len(), 1);
+        let result = RecursiveParser::new(tokens).parse();
+        assert!(result.is_err());
+        assert!(matches!(result.unwrap_err(), ParseError::WrongChainOrder { .. }));
     }
 }
