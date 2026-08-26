@@ -672,7 +672,7 @@ impl RecursiveParser {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use coffeeql_lexer::Lexer;
+    use coffeeql_lexer::token::Token;
 
     fn parse(src: &str) -> Vec<Statement> {
         let tokens = Lexer::new(src).tokenize().unwrap();
