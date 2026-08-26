@@ -7,6 +7,6 @@ pub mod error;
 pub mod pratt;
 pub mod recursive;
 
-pub use ast::{Statement, QueryNode, ChainOp, Expression};
+pub use ast::{ChainOp, Expression, QueryNode, Statement};
 pub use error::ParseError;
 pub use recursive::RecursiveParser;

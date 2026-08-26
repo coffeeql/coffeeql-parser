@@ -1,11 +1,8 @@
 //! CoffeeQL Abstract Syntax Tree
 
-use coffeeql_lexer::token::{
-    CollectionKind, Duration, Distance,
-    SortDir, DataType, Constraint,
-};
+use coffeeql_lexer::token::{CollectionKind, Constraint, DataType, Distance, Duration, SortDir};
 
-// ── Root  
+// ── Root
 
 #[derive(Debug, Clone)]
 pub enum Statement {
@@ -15,16 +12,16 @@ pub enum Statement {
     Menu(MenuNode),
 }
 
-// ── Query 
+// ── Query
 
 #[derive(Debug, Clone)]
 pub struct QueryNode {
     pub collection: String,
-    pub kind:       CollectionKind,
-    pub chain:      Vec<ChainOp>,
+    pub kind: CollectionKind,
+    pub chain: Vec<ChainOp>,
 }
 
-// ── Chain Operations 
+// ── Chain Operations
 
 #[derive(Debug, Clone)]
 pub enum ChainOp {
@@ -39,14 +36,14 @@ pub enum ChainOp {
     Spill,
 }
 
-// ── Where 
+// ── Where
 
 #[derive(Debug, Clone)]
 pub struct WhereNode {
     pub condition: Expression,
 }
 
-// ── Give 
+// ── Give
 
 #[derive(Debug, Clone)]
 pub struct GiveNode {
@@ -64,46 +61,56 @@ pub enum FieldExpr {
     /// orders{}.total
     CrossUnstructured(String, String),
     /// COUNT() as total
-    Aggregate { func: AggFunc, field: Option<String>, alias: String },
+    Aggregate {
+        func: AggFunc,
+        field: Option<String>,
+        alias: String,
+    },
     /// *
     Wildcard,
 }
 
 #[derive(Debug, Clone)]
-pub enum AggFunc { Count, Sum, Avg, Max, Min }
+pub enum AggFunc {
+    Count,
+    Sum,
+    Avg,
+    Max,
+    Min,
+}
 
 // ── Sort
 
 #[derive(Debug, Clone)]
 pub struct SortNode {
-    pub field:     String,
+    pub field: String,
     pub direction: SortDir,
 }
 
-// ── Cup 
+// ── Cup
 
 #[derive(Debug, Clone)]
 pub struct CupNode {
     pub limit: u64,
 }
 
-// ── Blend 
+// ── Blend
 
 #[derive(Debug, Clone)]
 pub struct BlendNode {
     pub field: String,
 }
 
-// ── Mix 
+// ── Mix
 #[derive(Debug, Clone)]
 pub struct MixNode {
-    pub collection:  String,
-    pub kind:        CollectionKind,
-    pub left_field:  String,
+    pub collection: String,
+    pub kind: CollectionKind,
+    pub left_field: String,
     pub right_field: String,
 }
 
-// ── Pour / Refill 
+// ── Pour / Refill
 
 #[derive(Debug, Clone)]
 pub struct PourNode {
@@ -127,31 +134,31 @@ pub struct ShotNode {
     pub queries: Vec<QueryNode>,
 }
 
-// ── Grind 
+// ── Grind
 
 #[derive(Debug, Clone)]
 pub struct GrindNode {
     pub collection: String,
-    pub kind:       CollectionKind,
-    pub schema:     Option<Vec<SchemaField>>,
-    pub flex:       bool,
+    pub kind: CollectionKind,
+    pub schema: Option<Vec<SchemaField>>,
+    pub flex: bool,
 }
 
 #[derive(Debug, Clone)]
 pub struct SchemaField {
-    pub name:        String,
-    pub data_type:   DataType,
+    pub name: String,
+    pub data_type: DataType,
     pub constraints: Vec<Constraint>,
 }
 
-// ── Menu 
+// ── Menu
 
 #[derive(Debug, Clone)]
 pub struct MenuNode {
     pub collection: Option<(String, CollectionKind)>,
 }
 
-// ── Expression 
+// ── Expression
 
 #[derive(Debug, Clone)]
 pub enum Expression {
@@ -168,8 +175,8 @@ pub enum Expression {
 
     // Binary ops
     Binary {
-        left:  Box<Expression>,
-        op:    BinaryOp,
+        left: Box<Expression>,
+        op: BinaryOp,
         right: Box<Expression>,
     },
 
@@ -180,16 +187,16 @@ pub enum Expression {
 
     // Special — geospatial
     Near {
-        field:    String,
-        lat:      f64,
-        lon:      f64,
+        field: String,
+        lat: f64,
+        lon: f64,
         distance: Distance,
     },
 
     // Special — AI similarity
     Like {
-        field:     String,
-        query:     String,
+        field: String,
+        query: String,
         threshold: f64,
     },
 
@@ -201,15 +208,20 @@ pub enum Expression {
 
     // Special — time window
     Last {
-        field:    String,
+        field: String,
         duration: Duration,
     },
 
     // Field exists check
-    Exists { field: String },
+    Exists {
+        field: String,
+    },
 
     // Function calls
-    FnCall { name: String, args: Vec<Expression> },
+    FnCall {
+        name: String,
+        args: Vec<Expression>,
+    },
 
     // Wildcard
     Wildcard,
@@ -217,5 +229,10 @@ pub enum Expression {
 
 #[derive(Debug, Clone)]
 pub enum BinaryOp {
-    Eq, NotEq, Gt, Lt, Gte, Lte,
+    Eq,
+    NotEq,
+    Gt,
+    Lt,
+    Gte,
+    Lte,
 }
