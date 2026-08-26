@@ -1,6 +1,6 @@
 //! CoffeeQL Abstract Syntax Tree
 
-use crate::lexer::token::{
+use coffeeql_lexer::token::{
     CollectionKind, Duration, Distance,
     SortDir, DataType, Constraint,
 };
