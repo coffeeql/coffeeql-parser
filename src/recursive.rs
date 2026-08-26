@@ -1,9 +1,9 @@
 //! Recursive Descent Parser
 //! Handles: query structure, chain operations, shot, grind, menu
 
-use coffeeql_lexer::Token;
+use coffeeql_lexer::token::Token;
 use coffeeql_lexer::token::{CollectionKind, SortDir, DataType, Constraint};
-use super::ast::*;
+use crate::ast::*;
 use super::error::ParseError;
 use super::pratt::{PrattParser, Precedence};
 
