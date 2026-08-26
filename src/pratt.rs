@@ -374,7 +374,7 @@ impl<'a> PrattParser<'a> {
 
     fn expect_distance(
         &mut self,
-    ) -> Result<crate::lexer::token::Distance, ParseError> {
+        ) -> Result<coffeeql_lexer::token::Distance, ParseError> {
         match self.current().clone() {
             Token::Distance(d) => { self.advance(); Ok(d) }
             other => Err(ParseError::UnexpectedToken {
