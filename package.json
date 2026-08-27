@@ -1,0 +1,65 @@
+{
+  "name": "coffeeql",
+  "displayName": "CoffeeQL",
+  "description": "Syntax highlighting, snippets, and hover documentation for CoffeeQL",
+  "version": "0.1.0",
+  "publisher": "coffeeql",
+  "icon": "icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/coffeeql/coffeeql-vscode"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Snippets"
+  ],
+  "keywords": [
+    "coffeeql",
+    "database",
+    "query",
+    "rust",
+    "bobadb"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "coffeeql",
+        "aliases": ["CoffeeQL", "coffeeql"],
+        "extensions": [".cql"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "coffeeql",
+        "scopeName": "source.coffeeql",
+        "path": "./syntaxes/coffeeql.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "coffeeql",
+        "path": "./snippets/coffeeql.json"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "eslint": "^8.0.0"
+  }
+}
